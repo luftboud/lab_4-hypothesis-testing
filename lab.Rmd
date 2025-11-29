@@ -6,7 +6,7 @@ Work breakdown:
 
 -   
 
--   Iia Maharyta - Problem 4
+-   Iia Maharyta - Problems 1 and 4
 
 The data for problems 1–3 are generated as follows: set $a_k := {k\ln (k^2n+ \pi)},\quad k≥1,$ where ${x}:= x−[x]$ is the fractional part of a number $x$ and $n$ is your id number. Sample realizations $X_1,...,X_{100}$ and $Y_1,...,Y_50$ from the hypothetical normal distributions $N (µ_1,σ^2_1 )$ and $N (µ_2,σ^2_2 )$ respectively are obtained as $x_k = Φ−1(a_k ), k= 1,...,100$, $y_l = Φ^{−1}(a_l+100), l= 1,...,50$, where $Φ$ is the cumulative distribution function of $N(0,1)$ and $Φ^{−1}$ is its inverse.
 
@@ -41,7 +41,6 @@ a_data  <- sapply(k_all, a_fun)
 
 # x_k = Phi^{-1}(a_k),  k = 1,...,100
 # y_l = Phi^{-1}(a_{l+100}), l = 1,...,50
-# Phi^{-1} = qnorm in R
 
 xk <- qnorm(a_data[1:100])
 yl <- qnorm(a_data[101:150])
@@ -56,6 +55,47 @@ yl <- qnorm(a_data[101:150])
 ```
 
 ## Problem 1
+
+$H_0 : µ_1 = µ_2 \quad vs. \quad H_1 : µ_1  \neq µ_2;\quad σ^2_1 = σ^2_2 = 1.$
+
+Here we should use z-test, because $\sigma^2$ is known:
+
+$$
+Z=\frac{​​\bar X−\bar Y}{\sqrt{\sigma^2_1​/n_1​+\sigma_2^2​/n_2}​}=\frac{​​\bar X−\bar Y}{\sqrt{1/100+1/50}​}​​=\frac{​​\bar X−\bar Y}{\sqrt{0.03}​}​​.
+$$
+
+so $H_0​: Z \sim N(0,1).$
+
+```{r}
+alpha  <- 0.05
+sigma1 <- 1
+sigma2 <- 1
+n1 <- length(xk)
+n2 <- length(yl)
+
+# Test statistic:
+z_stat <- (mean(xk) - mean(yl)) / sqrt(sigma1^2 / n1 + sigma2^2 / n2)
+
+
+z_crit <- qnorm(1 - alpha/2)
+
+p_val <- 2 * (1 - pnorm(abs(z_stat)))
+
+
+cat("Test statistic Z =", z_stat, "\n")
+cat("Rejection region at level", alpha, ": |Z| >", z_crit, "\n\n")
+
+cat("p-value =", p_val, "\n")
+
+if (abs(z_stat) > z_crit) {
+  cat("Decision at alpha =", alpha, ": reject H0.\n")
+} else {
+  cat("Decision at alpha =", alpha, ": do NOT reject H0.\n")
+}
+
+```
+
+For a two-sided test at level 0.05 the rejection region is $|Z| > z_{0.975} \approx 1.96$. In our data the observed z-statistic is very close to 0 and the corresponding p-value is about $p \approx 0.97$, which is much larger than $0.05$. Therefore we do **not** reject $H_0$​. The sample does not provide evidence that the two means are different.
 
 ## Problem 2
 
