@@ -8,6 +8,20 @@ Work breakdown:
 
 -   Iia Maharyta - Problem 4
 
+The data for problems 1–3 are generated as follows: set $a_k := {k\ln (k^2n+ \pi)},\quad k≥1,$ where ${x}:= x−[x]$ is the fractional part of a number $x$ and $n$ is your id number. Sample realizations $X_1,...,X_{100}$ and $Y_1,...,Y_50$ from the hypothetical normal distributions $N (µ_1,σ^2_1 )$ and $N (µ_2,σ^2_2 )$ respectively are obtained as $x_k = Φ−1(a_k ), k= 1,...,100$, $y_l = Φ^{−1}(a_l+100), l= 1,...,50$, where $Φ$ is the cumulative distribution function of $N(0,1)$ and $Φ^{−1}$ is its inverse.
+
+In R, you can define a function $f$ calculating ak from $k$, then apply $f$ to the whole list of $k$’s to get the list a.data of $a_k$ , and, finally get $x_k$ and $y_k$ by running qnorm on a.data.
+
+**Instructions**: In problems 1–3, test $H_0$ vs $H_1$. To this end,
+
+• point out what standard test you use and why;
+
+• indicate the general form of the rejection region of the test $H_0$ vs $H_1$ of level 0.05;
+
+• find out if $H_0$ should be rejected on the significance level 0.05;
+
+• indicate the p-value of the test and comment whether you would reject $H_0$ for that value of $p$ and why
+
 ## Problem 1
 
 ## Problem 2
