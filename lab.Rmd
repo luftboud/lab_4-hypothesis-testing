@@ -15,3 +15,134 @@ Work breakdown:
 ## Problem 3
 
 ## Problem 4
+
+In this task you’ll practice fitting the regression line to some real-life features and analyzing the results. The file data.csv contains data on students, specifically their study time and corresponding marks. Your tasks are as follows:
+
+(a) Create a scatter plot of Marks vs. Study Time and provide brief comments;
+
+(b) Fit a linear regression model using marks as the dependent variable and study time as the independent variable. Explain shortly the process of deriving the regression equation;
+
+(c) Evaluate the goodness-of-fit for the fitted line;
+
+(d) Suggest a way to test whether the study time is significant in predicting marks. Find the corresponding test statistics, specify its distribution. Find the p-value of the test and make a conclusion;
+
+(e) If Alice studies for approximately 8 hours, what grade can we predict for her?
+
+(f) Suggest up to three ideas to potentially improve prediction accuracy;
+
+```{r}
+data <- read.csv("data.csv")
+
+str(data)
+summary(data)
+```
+
+## a.
+
+```{r}
+plot(
+  x = data$time_study,
+  y = data$Marks,
+  xlab = "Study time",
+  ylab = "Marks",
+  main = "Marks vs Study time",
+  pch = 16
+)
+```
+
+The scatter plot of Marks vs Study time shows an approximately linear relationship: students who study more tend to receive higher marks. The points are reasonably close to a straight line and there are no extreme outliers, so a simple linear model looks like a good first approximation.
+
+## b.
+
+```{r}
+model.lm <- lm(lm(Marks ~ time_study, data = data))
+
+plot(x,y,  
+     xlab = "Study time",
+    ylab = "Marks",
+    main = "Marks vs Study time + linear regression",
+    pch = 16, 
+    col = "blue"
+    ) 
+model_summary <- summary(model.lm)
+
+abline(model.lm, col = "red")
+
+```
+
+We fit a simple linear regression model using `lm(Marks ~ time_study)`, where Marks is the dependent variable and study time is the predictor. The `lm` function chooses the intercept and slope that minimise the sum of squared vertical distances between the observed marks and the fitted line. This gives us a regression equation of the form
+
+$$
+\widehat{Marks}=\hat\alpha+\hat\beta⋅\text{time_study}+\epsilon,
+$$
+
+The coefficients $\hat\alpha$​ (intercept) and $\hat\beta$ (slope) are chosen by the method of ordinary least squares. For each observation $i$ we have an actual mark $y_i$​ and a fitted value $\hat y_i = \hat\alpha + \hat\beta x_i$, where $x_i$​ is the study time. We define the residuals $\epsilon_i = y_i - \hat y_i$ and choose $\hat\alpha,\hat\beta$​ to minimise the sum of squared residuals
+
+$$
+S(\alpha,\beta)=\sum_{i=1}^n (y_i - \alpha - \beta x_i)^2.
+$$
+Taking partial derivatives of $S$​, setting them to zero and solving the resulting “normal equations” gives the explicit formulas
+
+$$
+\hat\beta = \frac{\sum_{i=1}^n (x_i-\bar x)(y_i-\bar y)}{\sum_{i=1}^n (x_i-\bar x)^2}, 
+\qquad
+\hat\alpha = \bar y - \hat\beta \bar x,
+$$
+
+where $\bar x$ and $\bar y$​ are the sample means of study time and marks. The lm() function in R performs these calculations and returns the estimated parameters.
+
+## c. and d.
+
+```{r}
+r2 <- model_summary$r.squared
+r2adj <- model_summary$adj.r.squared
+
+coeff <- model_summary$coefficients
+
+t_val <- coeff["time_study", "t value"]
+p_val <- coeff["time_study", "Pr(>|t|)"]
+
+cat("R^2:", r2, "\n")
+cat("R^2 adjusted:", r2adj, "\n")
+cat("t-value:", t_val, "\n")
+cat("p-value:", p_val, "\n")
+```
+
+The coefficient of determination is $R^2 \approx 0.888$, meaning that about 88.8% of the variability in marks is explained by study time alone. The adjusted $R^2 \approx 0.887$ is almost identical, which indicates means the model is not overfitting and that the linear relationship captures most of the structure in the data. Overall, the fitted line provides a very good fit.
+
+To test whether study time is a significant predictor of marks, we test
+
+$$
+H_0 : \beta = 0 \quad \text{vs} \quad H_1 : \beta \neq 0.
+$$
+
+In simple linear regression the test statistic for this hypothesis is
+
+$$
+t = \frac{\hat\beta}{\text{SE}(\hat\beta)},
+$$
+
+which follows a Student t distribution with $n-2$ degrees of freedom under $H_0$​.\
+
+In our model the t-value for `time_study` is about 27.85, with a p-value of roughly $2.36 \times 10^{-48}$. This p-value is essentially zero on any reasonable significance level (e.g. 0.05), so we strongly reject $H_0$​. Study time is highly significant in predicting marks, and the true slope is very unlikely to be 0.
+
+## e.
+
+```{r}
+new_data <- data.frame(time_study = 8)
+
+data_pred <- predict(model.lm, newdata = new_data)
+data_pred
+```
+
+Using the fitted regression line, for a student who studies about 8 hours we obtain a predicted mark of approximately 46.7.
+
+## f.
+
+Some ideas to make model better:
+
+-   *We can add more predictors:* other variables that obviously affect marks (attendance, sleep quality, type of course, etc.), not only study time.
+
+-   *We can allow non-linear effects:* the relationship might flatten out for very large study times, so using a simple transformation could capture this.
+
+-   *We can check and clean the data:* identify and possibly remove clear outliers or data entry errors, and make sure marks and study time are measured consistently. Cleaner data usually means better predictions.
