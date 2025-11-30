@@ -4,7 +4,7 @@ Work breakdown:
 
 -   Kukurudza Viktoria - Problem 2
 
--   
+-   Sofiia Trush - Problem 3
 
 -   Iia Maharyta - Problems 1 and 4
 
@@ -115,6 +115,95 @@ res
 The F-test yielded a p-value of 0.9002, which is significantly higher than the significance level of $\alpha = 0.05$. Therefore, we fail to reject the null hypothesis ($H_0$). There is insufficient statistical evidence to support the claim that the variance of the first sample is greater than the variance of the second sample; thus, we treat the variances as equal.
 
 ## Problem 3
+Using Kolmogorov-Smirnov test in R, check if:
+
+(a) {$x_k$}$^{100}_{k=1}$ are normally distributed (with parameters calculated from the sample);
+
+We want to check whether {$x_k$}$^{100}_{k=1}$ has normal distribution.
+
+$H_0: {F}_x(t) = {F}_0(t)$ for all t
+
+$H_1: {F}_x(t) \ne {F}_0(t)$ for some t
+
+We have one sample, so we will use Kolmogorov’s Goodness-of-fit test (**one-sample Kolmogorov–Smirnov test)** to compare the empirical CDF of {$x_k$}$^{100}_{k=1}$ with the CDF of normal distribution with parameters calculated from the sample.
+
+So test statistic:
+
+$$
+d = \sup_{t}|\hat{F}_x(t)-{F}_0(t)|
+$$
+
+where $\hat{F}_x(t)$ is the empirical CDF of {$x_k$}$^{100}_{k=1}$ and ${F}_0(t)$ is CDF of normal distribution with parameters $\mu$ and $\sigma$, which are estimated from the sample.
+
+```{r}
+sample_mean <- mean(xk)
+sample_sd <- sd(xk)
+
+ks_norm <- ks.test(xk, "pnorm", mean = sample_mean, sd = sample_sd)
+ks_norm
+```
+
+The **test statistic is 0.06513**. This value is small, which means that the empirical CDF of {$x_k$}$^{100}_{k=1}$ is close to the CDF of the normal distribution $F_0(t)$.
+
+The **p value is 0.7899**. Since it's \> 0.05, we don't reject the null hypothesis $H_0$ at the 0.05 significance level. This means that {$x_k$}$^{100}_{k=1}$ are consistent with the normal distribution.
+
+(b) {$|x_k|$}$^{100}_{k=1}$ are exponentially distributed with $\lambda$ = 1;
+
+We want to check whether {$|x_k|$}$^{100}_{k=1}$ has exponential distribution.
+
+$H_0: {F}_{|x|}(t) = {F}_0(t)$ for all t
+
+$H_1: {F}_{|x|}(t) \ne {F}_0(t)$ for some t
+
+We have one sample, so we will use Kolmogorov’s Goodness-of-fit test (**one-sample Kolmogorov–Smirnov test)** to compare the empirical CDF of {$|x_k|$}$^{100}_{k=1}$ with the CDF of exponential distribution.
+
+So test statistic:
+
+$$
+d = \sup_{t}|\hat{F}_{|x|}(t)-{F}_0(t)|
+$$
+
+where $\hat{F}_x(t)$ is the empirical CDF of {$|x_k|$}$^{100}_{k=1}$ and ${F}_0(t)$ is CDF of exponential distribution with parameter $\lambda$ = 1.
+
+```{r}
+# theoretical E(X) = 1
+# theoretical Var(X) = 1
+abs_x <- abs(xk)
+
+ks_exp <- ks.test(abs_x, "pexp", rate = 1)
+ks_exp
+```
+
+The **test statistic is 0.17022**. This value is quite large, meaning that the empirical CDF of {$|x_k|$}$^{100}_{k=1}$ differs significantly from $F_0(t)$ - the theoretical CDF of the exponential distribution with $\lambda$ = 1.
+
+The **p value is 0.006078**. Since it's $\leq$ 0.05, we reject the null hypothesis $H_0$ at the 0.05 significance level. This means that {$|x_k|$}$^{100}_{k=1}$ don't follow exponential distribution with $\lambda$ = 1.
+
+(c) {$x_k$}$^{100}_{k=1}$ and {$y_l$}$^{50}_{l=1}$ have the same distributions.
+
+We want to check whether {$x_k$}$^{100}_{k=1}$ and {$y_l$}$^{50}_{l=1}$ have the same distribution.
+
+$H_0: {F}_x(t) = {F}_y(t)$ for all t
+
+$H_1: {F}_x(t) \ne {F}_y(t)$ for some t
+
+We have two samples, so we will use **two-sample Kolmogorov–Smirnov test** to compare two empirical CDFʼs.
+
+So test statistic:
+
+$$
+d = \sup_{t}|\hat{F}_x(t)-\hat{F}_y(t)|
+$$
+
+where $\hat{F}_x(t)$ is the empirical CDF of {$x_k$}$^{100}_{k=1}$ and $\hat{F}_y(t)$ is the empirical CDF of {$y_l$}$^{50}_{l=1}$.
+
+```{r}
+ks_two_sample <- ks.test(xk, yl)
+ks_two_sample
+```
+
+The **test statistic is 0.1**, which measures the maximum difference between two empirical CDF's. This value is small, meaning that the empirical CDF of {$x_k$}$^{100}_{k=1}$ is close to the empirical CDF of {$y_l$}$^{50}_{l=1}$.
+
+The **p value is 0.8846**. Since it's $>$ 0.05, we don't reject the null hypothesis $H_0$ at the 0.05 significance level. This means that two samples have very similar distributions.
 
 ## Problem 4
 
